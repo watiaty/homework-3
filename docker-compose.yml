@@ -1,4 +1,38 @@
 services:
+  service-discovery:
+    image: 'service-discovery:latest'
+    build:
+      context: service-discovery
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+
+  api-gateway:
+    image: 'api-gateway:latest'
+    build:
+      context: api-gateway
+      dockerfile: Dockerfile
+    depends_on:
+      - service-discovery
+    ports:
+      - "8090:8080"
+
+  ticket-service:
+    image: 'ticket-service:latest'
+    build:
+      context: ticket-service
+      dockerfile: Dockerfile
+    depends_on:
+      - ticket-service-db
+      - service-discovery
+      - api-gateway
+    environment:
+      DATABASE_URL: jdbc:postgresql://host.docker.internal:5432/ticket-service
+      DATABASE_USERNAME: admin
+      DATABASE_PASSWORD: admin
+    ports:
+      - "8091:8080"
+
   ticket-service-db:
     image: 'postgres:alpine3.19'
     container_name: ticket-service-db
@@ -9,48 +43,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ticket-service-db:/var/lib/postgresql/data
-
-  order-service-db:
-    image: 'postgres:alpine3.19'
-    container_name: order-service-db
-    environment:
-      POSTGRES_DB: order-service
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-    ports:
-      - "5433:5432"
-    volumes:
-      - ticket-service-db:/var/lib/postgresql/data
-
-  payment-service:
-    image: 'payment-service:latest'
-    build:
-      context: payment-service
-      dockerfile: Dockerfile
-    depends_on:
-      - service-discovery
-      - api-gateway
-    ports:
-      - "8093:8080"
-
-  api-gateway:
-    image: 'api-gateway:latest'
-    build:
-      context: api-gateway
-      dockerfile: Dockerfile
-    depends_on:
-      - service-discovery
-    ports:
-      - "8090:8090"
-
-  service-discovery:
-    image: 'service-discovery:latest'
-    build:
-      context: service-discovery
-      dockerfile: Dockerfile
-    ports:
-      - "8761:8761"
+      - ticket-service-volume:/var/lib/postgresql/data
 
   order-service:
     image: 'order-service:latest'
@@ -68,22 +61,31 @@ services:
     ports:
       - "8092:8080"
 
-  ticket-service:
-    image: 'ticket-service:latest'
+  order-service-db:
+    image: 'postgres:alpine3.19'
+    container_name: order-service-db
+    environment:
+      POSTGRES_DB: order-service
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5433:5432"
+    volumes:
+      - order-service-volume:/var/lib/postgresql/data
+
+  payment-service:
+    image: 'payment-service:latest'
     build:
-      context: ticket-service
+      context: payment-service
       dockerfile: Dockerfile
     depends_on:
-      - ticket-service-db
       - service-discovery
       - api-gateway
-    environment:
-      DATABASE_URL: jdbc:postgresql://host.docker.internal:5432/ticket-service
-      DATABASE_USERNAME: admin
-      DATABASE_PASSWORD: admin
     ports:
-     - "8091:8080"
+      - "8093:8080"
 
 volumes:
-  ticket-service-db:
-    name: ticket-service
+  ticket-service-volume:
+    name: ticket-service-volume
+  order-service-volume:
+    name: order-service-volume

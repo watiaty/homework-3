@@ -1,13 +1,13 @@
 server:
-  port: 8092
+  port: 8080
 
 spring:
   application:
     name: order-service
   datasource:
-    url: jdbc:postgresql://host.docker.internal:5433/order-service
-    username: admin
-    password: admin
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
 eureka:
