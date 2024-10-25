@@ -11,6 +11,63 @@ services:
     volumes:
       - ticket-service-db:/var/lib/postgresql/data
 
+  order-service-db:
+    image: 'postgres:alpine3.19'
+    container_name: db2
+    environment:
+      POSTGRES_DB: order-service
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5433:5432"
+    volumes:
+      - ticket-service-db:/var/lib/postgresql/data
+
+  payment-service:
+    image: 'spring:latest'
+    build:
+      context: payment-service
+      dockerfile: Dockerfile
+    depends_on:
+      - discovery-service
+      - api-gateway
+    ports:
+      - "8095:8080"
+
+  api-gateway:
+    image: 'spring:latest'
+    build:
+      context: api-gateway
+      dockerfile: Dockerfile
+    depends_on:
+      - discovery-service
+    ports:
+      - "8094:8080"
+
+  discovery-service:
+    image: 'spring:latest'
+    build:
+      context: discovery-service
+      dockerfile: Dockerfile
+    ports:
+      - "8093:8080"
+
+  order-service:
+    image: 'spring:latest'
+    build:
+      context: ticket-service
+      dockerfile: Dockerfile
+    depends_on:
+      - order-service-db
+      - discovery-service
+      - api-gateway
+    environment:
+      DATABASE_URL: jdbc:postgresql://host.docker.internal:5433/order-service
+      DATABASE_USERNAME: admin
+      DATABASE_PASSWORD: admin
+    ports:
+      - "8092:8080"
+
   ticket-service:
     image: 'spring:latest'
     build:
