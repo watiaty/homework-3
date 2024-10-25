@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: ticket-service
+  datasource:
+    url: jdbc:postgresql://host.docker.internal:5432/ticket-service
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+server:
+  port: 8091
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

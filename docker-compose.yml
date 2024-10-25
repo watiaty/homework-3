@@ -1,0 +1,30 @@
+services:
+  ticket-service-db:
+    image: 'postgres:alpine3.19'
+    container_name: db2
+    environment:
+      POSTGRES_DB: ticket-service
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - ticket-service-db:/var/lib/postgresql/data
+
+  ticket-service:
+    image: 'spring:latest'
+    build:
+      context: ticket-service
+      dockerfile: Dockerfile
+    depends_on:
+      - ticket-service-db
+    environment:
+      DATABASE_URL: jdbc:postgresql://host.docker.internal:5432/ticket-service
+      DATABASE_USERNAME: admin
+      DATABASE_PASSWORD: admin
+    ports:
+     - "8091:8080"
+
+volumes:
+  ticket-service-db:
+    name: ticket-service
