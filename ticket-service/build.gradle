@@ -8,10 +8,8 @@ group = 'com.aston'
 version = '0.0.1-SNAPSHOT'
 
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+java {
+	sourceCompatibility = '17'
 }
 
 repositories {
@@ -41,8 +39,4 @@ dependencyManagement {
 
 tasks.named('test') {
 	useJUnitPlatform()
-}
-
-bootJar {
-	duplicatesStrategy = 'EXCLUDE'
 }

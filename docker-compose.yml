@@ -24,7 +24,7 @@ services:
       - ticket-service-db:/var/lib/postgresql/data
 
   payment-service:
-    image: 'spring:latest'
+    image: 'payment-service:latest'
     build:
       context: payment-service
       dockerfile: Dockerfile
@@ -35,7 +35,7 @@ services:
       - "8093:8080"
 
   api-gateway:
-    image: 'spring:latest'
+    image: 'api-gateway:latest'
     build:
       context: api-gateway
       dockerfile: Dockerfile
@@ -53,9 +53,9 @@ services:
       - "8761:8761"
 
   order-service:
-    image: 'spring:latest'
+    image: 'order-service:latest'
     build:
-      context: ticket-service
+      context: order-service
       dockerfile: Dockerfile
     depends_on:
       - order-service-db
@@ -69,7 +69,7 @@ services:
       - "8092:8080"
 
   ticket-service:
-    image: 'spring:latest'
+    image: 'ticket-service:latest'
     build:
       context: ticket-service
       dockerfile: Dockerfile
