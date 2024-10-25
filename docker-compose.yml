@@ -1,7 +1,7 @@
 services:
   ticket-service-db:
     image: 'postgres:alpine3.19'
-    container_name: db2
+    container_name: ticket-service-db
     environment:
       POSTGRES_DB: ticket-service
       POSTGRES_USER: admin
@@ -13,7 +13,7 @@ services:
 
   order-service-db:
     image: 'postgres:alpine3.19'
-    container_name: db2
+    container_name: order-service-db
     environment:
       POSTGRES_DB: order-service
       POSTGRES_USER: admin
@@ -29,10 +29,10 @@ services:
       context: payment-service
       dockerfile: Dockerfile
     depends_on:
-      - discovery-service
+      - service-discovery
       - api-gateway
     ports:
-      - "8095:8080"
+      - "8093:8080"
 
   api-gateway:
     image: 'spring:latest'
@@ -40,17 +40,17 @@ services:
       context: api-gateway
       dockerfile: Dockerfile
     depends_on:
-      - discovery-service
+      - service-discovery
     ports:
-      - "8094:8080"
+      - "8090:8090"
 
-  discovery-service:
-    image: 'spring:latest'
+  service-discovery:
+    image: 'service-discovery:latest'
     build:
-      context: discovery-service
+      context: service-discovery
       dockerfile: Dockerfile
     ports:
-      - "8093:8080"
+      - "8761:8761"
 
   order-service:
     image: 'spring:latest'
@@ -59,7 +59,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - order-service-db
-      - discovery-service
+      - service-discovery
       - api-gateway
     environment:
       DATABASE_URL: jdbc:postgresql://host.docker.internal:5433/order-service
@@ -75,6 +75,8 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - ticket-service-db
+      - service-discovery
+      - api-gateway
     environment:
       DATABASE_URL: jdbc:postgresql://host.docker.internal:5432/ticket-service
       DATABASE_USERNAME: admin
