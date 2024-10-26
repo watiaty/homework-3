@@ -73,6 +73,32 @@ services:
     volumes:
       - order-service-volume:/var/lib/postgresql/data
 
+  tour-service:
+    image: 'tour-service:latest'
+    build:
+      context: tour-service
+      dockerfile: Dockerfile
+    depends_on:
+      - tour-service-db
+    environment:
+      DATABASE_URL: jdbc:postgresql://host.docker.internal:5434/tour-service
+      DATABASE_USERNAME: admin
+      DATABASE_PASSWORD: admin
+    ports:
+      - "8094:8080"
+
+  tour-service-db:
+    image: 'postgres:alpine3.19'
+    container_name: tour-service-db
+    environment:
+      POSTGRES_DB: tour-service
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5434:5432"
+    volumes:
+      - tour-service-volume:/var/lib/postgresql/data
+
   payment-service:
     image: 'payment-service:latest'
     build:
@@ -108,3 +134,5 @@ volumes:
     name: ticket-service-volume
   order-service-volume:
     name: order-service-volume
+  tour-service-volume:
+    name: tour-service-volume
