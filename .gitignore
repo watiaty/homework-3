@@ -1,0 +1,11 @@
+/tour-service/target/
+/ticket-service/.gradle/
+/ticket-service/build/
+/service-discovery/.gradle/
+/service-discovery/build/
+/payment-service/.gradle/
+/payment-service/build/
+/order-service/.gradle/
+/order-service/build/
+/api-gateway/.gradle/
+/api-gateway/build/
